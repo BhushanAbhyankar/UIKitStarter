@@ -12,16 +12,15 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var detailLabel: UILabel!
    
     var receivedData:String = ""
-    
+    var user:UserResponse?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
-        detailLabel.text = "I'm Details Screen and Had receivedData = \(receivedData)"
-        
-        
+        detailLabel.text = "I'm Details Screen and Had receivedData = \(user?.name ?? receivedData)"
+
     }
     
 

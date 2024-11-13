@@ -11,7 +11,9 @@ class MyCollectionViewController: UIViewController {
  
 
     @IBOutlet weak var myCollectionView: UICollectionView!
-    var itemList = ["Jan","Feb","March", "April", "May", "June","July","Aug","Sept","Jan","Feb","March", "April", "May", "June","July","Aug","Sept","Jan","Feb","March", "April", "May", "June","July","Aug","Sept"]
+    var itemList = ["Jan","Feb","March", "April", "May", "June","July","Aug","Sept"]
+    var usersList = [UserResponse]()
+    var networkManager = NetworkManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,6 +21,13 @@ class MyCollectionViewController: UIViewController {
         // Do any additional setup after loading the view.
         myCollectionView.dataSource = self
         myCollectionView.delegate = self
+        
+        self.networkManager.getDataFromAPI { [weak self] userlist in
+            self?.usersList = userlist
+            DispatchQueue.main.async {
+                self?.myCollectionView.reloadData()
+            }
+        }
     }
     
 
@@ -36,22 +45,35 @@ class MyCollectionViewController: UIViewController {
 extension MyCollectionViewController:UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        itemList.count
+        if section == 0{
+            return usersList.count
+        }
+        return itemList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCellID", for: indexPath) as! MyCollectionViewCell
-        cell.gridTitlelabel.text = itemList[indexPath.item]
+        if indexPath.section == 0{
+            let user = usersList[indexPath.item]
+            cell.gridTitlelabel.text = user.name
+
+        }else{
+            cell.gridTitlelabel.text = itemList[indexPath.item]
+        }
         return cell
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 3
+        return 2
     }
     
 }
 extension MyCollectionViewController:UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(itemList[indexPath.item])
+//        print(itemList[indexPath.item])
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        
+        let webVC = storyBoard.instantiateViewController(withIdentifier: "WebPageViewController") as! WebPageViewController
+        self.navigationController?.pushViewController(webVC, animated: true)
     }
 }
